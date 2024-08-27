@@ -311,13 +311,11 @@ class ImageKitUppyPlugin extends BasePlugin {
 
                 this.onFileRemove(file.id, () => {
                     socket.send('pause', {})
-                    queuedRequest.abort()
                     resolve(`upload ${file.id} was removed`)
                 })
 
                 this.onCancelAll(file.id, () => {
                     socket.send('pause', {})
-                    queuedRequest.abort()
                     resolve(`upload ${file.id} was canceled`)
                 })
 
@@ -334,9 +332,8 @@ class ImageKitUppyPlugin extends BasePlugin {
                 socket.on('progress', (progressData) => emitSocketProgress(this, progressData, file))
 
                 socket.on('success', (data) => {
-                    var uploadResponse = JSON.parse(data.response.responseText);
+                    const uploadResponse = JSON.parse(data.response.responseText);
 
-                    queuedRequest.done()
                     if (this.uploaderEvents[file.id]) {
                         this.uploaderEvents[file.id].remove()
                         this.uploaderEvents[file.id] = null
@@ -345,14 +342,13 @@ class ImageKitUppyPlugin extends BasePlugin {
                 })
 
                 socket.on('error', (errData) => {
-                    queuedRequest.done()
                     if (this.uploaderEvents[file.id]) {
                         this.uploaderEvents[file.id].remove()
                         this.uploaderEvents[file.id] = null
                     }
 
                     try {
-                        var error = JSON.parse(errData.responseText);
+                        const error = JSON.parse(errData.responseText);
                         if (error.message) {
                             return reject([error.message]);
                         }
