@@ -338,6 +338,8 @@ class ImageKitUppyPlugin extends BasePlugin {
                         this.uploaderEvents[file.id].remove()
                         this.uploaderEvents[file.id] = null
                     }
+
+                    socket.close()
                     return resolve(uploadResponse);
                 })
 
@@ -346,6 +348,7 @@ class ImageKitUppyPlugin extends BasePlugin {
                         this.uploaderEvents[file.id].remove()
                         this.uploaderEvents[file.id] = null
                     }
+                    socket.close()
 
                     try {
                         const error = JSON.parse(errData.responseText);
@@ -360,14 +363,10 @@ class ImageKitUppyPlugin extends BasePlugin {
                     }
                 })
 
-                const queuedRequest = this.requests.run(() => {
-                    socket.open()
-                    if (file.isPaused) {
-                        socket.send('pause', {})
-                    }
-
-                    return () => socket.close()
-                })
+                socket.open()
+                if (file.isPaused) {
+                    socket.send('pause', {})
+                }
             }).catch((err) => {
                 reject([err]);
             })
